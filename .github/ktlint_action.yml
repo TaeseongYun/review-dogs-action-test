@@ -1,0 +1,26 @@
+name: 'Ktlint action'
+
+on: [ push ]
+
+job:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - id: checkout
+        name: Checkout Repository
+        with:
+          clean: true
+          ref: ${{env.checkout_ref}}
+
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v3
+
+      - id: Ktlint Formatting
+        name: Ktlint format
+        run: |
+          ./gradlew ktlintFormat
+        
+
+
+
+
