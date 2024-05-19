@@ -9,7 +9,7 @@ import io.gitlab.arturbosch.detekt.api.Rule
 import io.gitlab.arturbosch.detekt.api.Severity
 import org.jetbrains.kotlin.psi.KtFile
 
-internal class ServiceRule(config: Config) : Rule(config) {
+class ServiceRule(config: Config) : Rule(config) {
   override val issue: Issue = Issue(
     id = "ServiceInterfaceNaming",
     severity = Severity.Style,
