@@ -7,10 +7,16 @@ import io.gitlab.arturbosch.detekt.api.Entity
 import io.gitlab.arturbosch.detekt.api.Issue
 import io.gitlab.arturbosch.detekt.api.Rule
 import io.gitlab.arturbosch.detekt.api.Severity
-import org.jetbrains.kotlin.psi.KtClass
-import org.jetbrains.kotlin.psi.KtFile
+import io.gitlab.arturbosch.detekt.api.config
+import io.gitlab.arturbosch.detekt.api.internal.Configuration
+import io.gitlab.arturbosch.detekt.rules.identifierName
+import org.jetbrains.kotlin.psi.KtClassOrObject
 
 class ServiceRule(config: Config) : Rule(config) {
+
+  @Configuration("naming pattern")
+  private val classPattern: Regex by config("[A-Z][a-zA-Z0-9]*Service[A-Z][a-zA-Z0-9]*") { it.toRegex() }
+
   override val issue: Issue = Issue(
     id = "ServiceInterfaceNaming",
     severity = Severity.Style,
@@ -18,18 +24,19 @@ class ServiceRule(config: Config) : Rule(config) {
     debt = Debt.FIVE_MINS
   )
 
-  override fun visitKtFile(file: KtFile) {
-    super.visitKtFile(file)
-    file.declarations.forEach { declaration ->
-      if (declaration is KtClass && declaration.isInterface() && declaration.name?.contains("Service") == true) {
-        report(
-          CodeSmell(
-            issue,
-            Entity.from(declaration),
-            message = "debug 와 release 둘 다 변경 적용하셨나요? 적용하였다면 이모지를 남겨주세요."
-          )
+  override fun visitClassOrObject(classOrObject: KtClassOrObject) {
+    super.visitClassOrObject(classOrObject)
+    if (classOrObject.nameAsSafeName.isSpecial || classOrObject.nameIdentifier?.parent?.javaClass == null) {
+      return
+    }
+    if (!classOrObject.identifierName().removeSurrounding("`").matches(classPattern)) {
+      report(
+        CodeSmell(
+          issue,
+          Entity.atName(classOrObject),
+          message = "release Service 에도 동일하게 적용을 하셨나요 ? 적용을 하셨다면 이모지를 남겨주세요"
         )
-      }
+      )
     }
   }
 }
