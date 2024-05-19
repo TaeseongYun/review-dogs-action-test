@@ -2,17 +2,6 @@ complexity:
   TooManyFunctions:
     active: true
     ignoreAnnotatedFunctions: [ 'Preview' ]
-  MagicNumber:
-    active: true
-    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**', '**/*.kts' ]
-    ignoreNumbers:
-      - '-1'
-      - '0'
-      - '1'
-      - '2'
-    ignoreHashCodeFunction: true
-    ignorePropertyDeclaration: true
-    ignoreCompanionObjectPropertyDeclaration: true
   LongParameterList:
     active: true
     functionThreshold: 6
@@ -25,7 +14,17 @@ complexity:
 style:
   NewLineAtEndOfFile:
     active: true
-    exclude: [ '**/test/**', '**/*.Test.kt' ]
+  MagicNumber:
+    active: true
+    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**', '**/*.kts' ]
+    ignoreNumbers:
+      - '-1'
+      - '0'
+      - '1'
+      - '2'
+    ignoreHashCodeFunction: true
+    ignorePropertyDeclaration: true
+    ignoreCompanionObjectPropertyDeclaration: true
 
 
 naming:
