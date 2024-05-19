@@ -1,3 +1,4 @@
 own-rule:
+  active: true
   ServiceRule:
     active: true
