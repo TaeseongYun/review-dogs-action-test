@@ -1,22 +1,23 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    id("io.gitlab.arturbosch.detekt")
 }
 
 android {
     namespace = "com.example.myapplication"
     compileSdk = 34
-    
+
     defaultConfig {
         applicationId = "com.example.myapplication"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
-        
+
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
-    
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -33,7 +34,7 @@ android {
 }
 
 dependencies {
-    
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
