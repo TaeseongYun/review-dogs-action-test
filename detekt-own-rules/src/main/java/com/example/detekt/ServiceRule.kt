@@ -17,12 +17,13 @@ internal class ServiceRule(config: Config) : Rule(config) {
     debt = Debt.FIVE_MINS
   )
 
-  override fun visit(root: KtFile) {
-    if (root.name.contains("Service")) {
+  override fun visitKtFile(file: KtFile) {
+    super.visitKtFile(file)
+    if (file.name.contains("Service")) {
       report(
         CodeSmell(
           issue,
-          Entity.from(root),
+          Entity.from(file),
           message = "debug 와 release 둘 다 변경 적용하셨나요 ? 적용하였다면 이모지를 남겨주세요."
         )
       )
