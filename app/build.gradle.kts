@@ -49,7 +49,7 @@ dependencies {
 
 tasks.detekt.configure {
   reports {
-    html.required.set(true)
-    html.outputLocation.set(file("build/reports/detekt/detekt.html"))
+    xml.required.set(true)
+    xml.outputLocation.set(file("build/reports/detekt/detekt.xml"))
   }
 }
