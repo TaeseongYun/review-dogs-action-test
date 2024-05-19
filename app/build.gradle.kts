@@ -46,3 +46,10 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 }
+
+tasks.detekt.configure {
+  reports {
+    html.required.set(true)
+    html.outputLocation.set(file("build/reports/detekt/detekt.html"))
+  }
+}

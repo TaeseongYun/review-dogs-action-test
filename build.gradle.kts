@@ -6,10 +6,3 @@ plugins {
     id("io.gitlab.arturbosch.detekt") version "1.23.6"
   alias(libs.plugins.jetbrains.kotlin.jvm) apply false
 }
-
-tasks.detekt.configure {
-  reports {
-    xml.required.set(true)
-    xml.outputLocation.set(file("build/reports/detekt/detekt.xml"))
-  }
-}
