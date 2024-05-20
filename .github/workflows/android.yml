@@ -39,5 +39,6 @@ jobs:
         shell: bash
         run: |
           find . -name "detekt.xml" | while read -r file; do
+            echo "$file"
             cat "$file" | reviewdog -f=checkstyle -name="detekt" -reporter="github-pr-review" -level="info"
           done
