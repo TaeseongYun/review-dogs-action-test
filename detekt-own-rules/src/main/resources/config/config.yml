@@ -2,3 +2,6 @@ own-rule:
   active: true
   ServiceRule:
     active: true
+  ContextOrder:
+    active: true
+

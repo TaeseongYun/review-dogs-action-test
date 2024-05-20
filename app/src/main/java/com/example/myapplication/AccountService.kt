@@ -1,5 +1,5 @@
 package com.example.myapplication
 
-interface FooService {
+interface AccountService {
   val a: Boolean
 }
