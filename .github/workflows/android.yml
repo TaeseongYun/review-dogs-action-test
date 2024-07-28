@@ -3,6 +3,8 @@ on: [ pull_request ]
 
 permissions:
   contents: read
+  checks: write
+  issues: write
   pull-requests: write
 
 jobs:
@@ -44,5 +46,6 @@ jobs:
           # Loop through each file in the array and process it with reviewdog
           for file in $detekt_files; do
             echo "Processing $file"
-            cat "$file" | reviewdog -f=checkstyle -name="detekt-$(basename $(dirname $file))" -reporter="github-pr-review" -level="info"
+            base_dir=$(basename $(dirname $file))
+            cat "$file" | reviewdog -f=checkstyle -name="detekt-$base_dir" -reporter="github-pr-review" -level="info"
           done
