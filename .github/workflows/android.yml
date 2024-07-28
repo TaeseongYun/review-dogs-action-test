@@ -38,7 +38,9 @@ jobs:
 
       - name: 'Merge all detekt reports'
         run: |
+          echo "Merging all detekt reports into one file"
           find . -name "detekt.xml" -exec cat {} + > merged-detekt.xml
+          cat merged-detekt.xml  # 병합된 파일 내용 출력
 
       - name: 'Review dogs'
         env:
