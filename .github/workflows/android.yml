@@ -1,8 +1,10 @@
 name: reviewdog
-on: [ pull_request ]
+on: [pull_request]
 
 permissions:
   contents: read
+  checks: write
+  issues: write
   pull-requests: write
 
 jobs:
@@ -26,19 +28,44 @@ jobs:
       - name: Grant execute permission
         run: chmod +x gradlew
 
-      - name: 'build detekt'
+      - name: 'Build detekt'
         shell: bash
         run: ./gradlew detekt
 
       - uses: reviewdog/action-setup@v1
         with:
           reviewdog_version: latest
-      - name: "review dogs"
+
+      - name: Install xmllint
+        run: sudo apt-get update && sudo apt-get install -y libxml2-utils
+
+      - name: Merge detekt reports
+        run: |
+          merged_report="merged_detekt.xml"
+          version="4.3" # Default version if no other is found
+
+          # Find the version from the first detekt.xml file found
+          first_file=$(find . -name "detekt.xml" | head -n 1)
+          if [ -n "$first_file" ]; then
+            version=$(grep -oP '(?<=<checkstyle version=")[^"]*' "$first_file")
+            [ -z "$version" ] && version="4.3"
+          fi
+
+          echo '<?xml version="1.0" encoding="UTF-8"?>' > $merged_report
+          echo "<checkstyle version=\"$version\">" >> $merged_report
+
+          # Find all detekt.xml files and merge them into one report
+          find . -name "detekt.xml" | while read -r file; do
+            echo "Processing $file"
+            # Append the content of each detekt.xml file except the header and footer
+            sed -n '/<file/,/<\/file>/p' "$file" >> $merged_report
+          done
+
+          echo '</checkstyle>' >> $merged_report
+          cat $merged_report
+
+      - name: Run reviewdog
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.github_token }}
-        shell: bash
         run: |
-          find . -name "detekt.xml" | while read -r file; do
-            echo "$file"
-            cat "$file" | reviewdog -f=checkstyle -name="detekt" -reporter="github-pr-review" -level="info"
-          done
+          cat merged_detekt.xml | reviewdog -f=checkstyle -name="detekt" -reporter="github-pr-review" -level="info"
