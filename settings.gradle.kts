@@ -22,3 +22,5 @@ dependencyResolutionManagement {
 rootProject.name = "My Application"
 include(":app")
 include(":detekt-own-rules")
+include(":feature")
+include(":feature:test")
