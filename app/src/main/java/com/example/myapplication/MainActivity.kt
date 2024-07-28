@@ -30,4 +30,8 @@ class MainActivity : AppCompatActivity() {
   fun test(a: Boolean, context: Context) {
 
   }
+
+  fun test2(a: Boolean, context: Context) {
+    
+  }
 }
