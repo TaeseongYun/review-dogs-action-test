@@ -38,4 +38,7 @@ jobs:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.github_token }}
         shell: bash
         run: |
-          cat ./app/build/reports/detekt/detekt.xml | reviewdog -f=checkstyle -name="detekt" -reporter="github-pr-review" -level="info"
+          find . -name "detekt.xml" | while read -r file; do
+            echo "$file"
+            cat "$file" | reviewdog -f=checkstyle -name="detekt" -reporter="github-pr-review" -level="info"
+          done
