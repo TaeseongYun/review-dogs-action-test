@@ -36,20 +36,23 @@ jobs:
         with:
           reviewdog_version: latest
 
-      - name: 'Merge detekt reports'
-        shell: bash
+      - name: Merge detekt reports
         run: |
           merged_report="merged_detekt.xml"
           echo '<?xml version="1.0" encoding="UTF-8"?>' > $merged_report
           echo '<checkstyle version="4.3">' >> $merged_report
+
+          # Find all detekt.xml files and merge them into one report
           find . -name "detekt.xml" | while read -r file; do
-            grep '<file ' "$file" >> $merged_report
+            echo "Processing $file"
+            # Append the content of each detekt.xml file except the header and footer
+            grep '<file' $file | sed 's/^/  /' >> $merged_report
           done
+
           echo '</checkstyle>' >> $merged_report
 
-      - name: 'Run reviewdog'
+      - name: Run reviewdog
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.github_token }}
-        shell: bash
         run: |
-          reviewdog -f=checkstyle -name="detekt" -reporter="github-pr-review" -level="info" < merged_detekt.xml
+          cat merged_detekt.xml | reviewdog -f=checkstyle -name="detekt" -reporter="github-pr-review" -level="info"
