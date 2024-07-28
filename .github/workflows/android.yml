@@ -26,19 +26,23 @@ jobs:
       - name: Grant execute permission
         run: chmod +x gradlew
 
-      - name: 'build detekt'
+      - name: 'Build detekt'
         shell: bash
         run: ./gradlew detekt
 
       - uses: reviewdog/action-setup@v1
         with:
           reviewdog_version: latest
-      - name: "review dogs"
+
+      - name: 'Review dogs'
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.github_token }}
         shell: bash
         run: |
-          find . -name "detekt.xml" | while read -r file; do
-            echo "$file"
+          # Find all detekt.xml files and store them in an array
+          detekt_files=$(find . -name "detekt.xml")
+          # Loop through each file in the array and process it with reviewdog
+          for file in $detekt_files; do
+            echo "Processing $file"
             cat "$file" | reviewdog -f=checkstyle -name="detekt" -reporter="github-pr-review" -level="info"
           done
