@@ -1,5 +1,5 @@
 name: reviewdog
-on: [ pull_request ]
+on: [pull_request]
 
 permissions:
   contents: read
@@ -36,14 +36,21 @@ jobs:
         with:
           reviewdog_version: latest
 
-      - name: 'Merge all detekt reports'
+      - name: 'Merge detekt reports'
+        shell: bash
         run: |
-          echo "Merging all detekt reports into one file"
-          find . -name "detekt.xml" -exec cat {} + > merged-detekt.xml
-          cat merged-detekt.xml  # 병합된 파일 내용 출력
+          merged_report="merged_detekt.xml"
+          echo '<?xml version="1.0" encoding="UTF-8"?>' > $merged_report
+          echo '<checkstyle version="4.3">' >> $merged_report
+          find . -name "detekt.xml" | while read -r file; do
+            # Extract the content inside <checkstyle> tags
+            grep -v '<?xml version="1.0" encoding="UTF-8"?>' "$file" | grep -v '<checkstyle version="4.3">' | grep -v '</checkstyle>' >> $merged_report
+          done
+          echo '</checkstyle>' >> $merged_report
 
-      - name: 'Review dogs'
+      - name: 'Run reviewdog'
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.github_token }}
+        shell: bash
         run: |
-          cat merged-detekt.xml | reviewdog -f=checkstyle -name="detekt" -reporter="github-pr-review" -level="info"
+          reviewdog -f=checkstyle -name="detekt" -reporter="github-pr-review" -level="info" < merged_detekt.xml
