@@ -1,51 +1,47 @@
-name: reviewdog
-on: [ pull_request ]
+name: Detekt Analysis
+on: [pull_request]
 
 permissions:
   contents: read
-  checks: write
-  issues: write
   pull-requests: write
 
 jobs:
   detekt:
-    name: Check Code Quality
     runs-on: ubuntu-latest
 
     steps:
-      - name: Clone repo
+      - name: Checkout repository
         uses: actions/checkout@v2
         with:
           fetch-depth: 1
           ref: ${{ github.head_ref }}
 
-      - uses: actions/setup-java@v3
+      - name: Set up JDK
+        uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '17'
-          cache: 'gradle'
 
       - name: Grant execute permission
         run: chmod +x gradlew
 
-      - name: 'Build detekt'
-        shell: bash
+      - name: Run detekt
         run: ./gradlew detekt
 
       - uses: reviewdog/action-setup@v1
         with:
           reviewdog_version: latest
 
-      - name: 'Review dogs'
+      - name: Run reviewdog for all detekt reports
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.github_token }}
         shell: bash
         run: |
-          # Find all detekt.xml files and store them in an array
           detekt_files=$(find . -name "detekt.xml")
-          # Loop through each file in the array and process it with reviewdog
           for file in $detekt_files; do
             echo "Processing $file"
             base_dir=$(basename $(dirname $file))
-            cat "$file" | reviewdog -f=checkstyle -name="detekt-$base_dir" -reporter="github-pr-review" -level="info"
+            reviewdog_name="detekt-$base_dir"
+            echo "Using reviewdog name: $reviewdog_name"
+            cat "$file" | reviewdog -f=checkstyle -name="$reviewdog_name" -reporter="github-pr-review" -level="info"
           done
