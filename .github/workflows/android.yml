@@ -50,6 +50,7 @@ jobs:
           done
 
           echo '</checkstyle>' >> $merged_report
+          cat $merged_report
 
       - name: Run reviewdog
         env:
