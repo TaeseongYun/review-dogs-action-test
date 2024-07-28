@@ -43,8 +43,7 @@ jobs:
           echo '<?xml version="1.0" encoding="UTF-8"?>' > $merged_report
           echo '<checkstyle version="4.3">' >> $merged_report
           find . -name "detekt.xml" | while read -r file; do
-            # Extract the content inside <checkstyle> tags
-            grep -v '<?xml version="1.0" encoding="UTF-8"?>' "$file" | grep -v '<checkstyle version="4.3">' | grep -v '</checkstyle>' >> $merged_report
+            grep '<file ' "$file" >> $merged_report
           done
           echo '</checkstyle>' >> $merged_report
 
