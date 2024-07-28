@@ -36,17 +36,24 @@ jobs:
         with:
           reviewdog_version: latest
 
+      - name: Install xmllint
+        run: sudo apt-get update && sudo apt-get install -y libxml2-utils
+
       - name: Merge detekt reports
         run: |
           merged_report="merged_detekt.xml"
+          version=$(xmllint --xpath 'string(/checkstyle/@version)' $(find . -name "detekt.xml" | head -n 1))
+          if [ -z "$version" ]; then
+            version="4.3"
+          fi
           echo '<?xml version="1.0" encoding="UTF-8"?>' > $merged_report
-          echo '<checkstyle version="4.3">' >> $merged_report
+          echo "<checkstyle version=\"$version\">" >> $merged_report
 
           # Find all detekt.xml files and merge them into one report
           find . -name "detekt.xml" | while read -r file; do
             echo "Processing $file"
             # Append the content of each detekt.xml file except the header and footer
-            grep '<file' $file | sed 's/^/  /' >> $merged_report
+            xmllint --xpath '//file' "$file" >> $merged_report
           done
 
           echo '</checkstyle>' >> $merged_report
